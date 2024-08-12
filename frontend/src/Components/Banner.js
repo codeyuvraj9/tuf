@@ -66,7 +66,7 @@ export default function Banner() {
                             {banner.description}
                         </Typography>
                         <Typography variant="body1" gutterBottom>
-                            {formatTime(countdown)}
+                            This banner will disappear in {formatTime(countdown)}
                         </Typography>
                         <MUILink href={banner.link} target="_blank" rel="noopener noreferrer" underline="none">
                             <Button variant="contained" color="primary">
