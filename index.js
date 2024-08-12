@@ -4,14 +4,9 @@ const cors = require('cors');
 const connection = require('./db'); 
 const path = require("path");
 
-app.get("/", (req, res) => {
-app.use(express.static(path.resolve(__dirname, "frontend", "build")));
-res.sendFile(path.resolve(__dirname, "frontend", "build", "index.html"));
-});
-
 
 const app = express();
-const port = 5000;
+const port = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -40,6 +35,12 @@ app.post('/api/updatebanner', (req, res) => {
       res.send({ message: 'Banner settings updated' });
     }
   );
+});
+
+app.use(express.static(path.join(__dirname, 'frontend', 'build')));
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'frontend', 'build', 'index.html'));
 });
 
 app.listen(port, () => {
