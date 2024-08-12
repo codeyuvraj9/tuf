@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import {
-  Box,
-  Typography,
-  Button, FormControl, FormLabel, Checkbox, TextField, 
-} from '@mui/material';
+import { Box, Typography, Button, FormControl, FormLabel, Checkbox, TextField, Snackbar, Alert } from '@mui/material';
 import Banner from './Banner'
 
 const Dashboard = () => {
+  //snackbar for success and error messages
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'success'
+  });
+
   //Code for setting Banner, Dashboard part
   const [settings, setSettings] = useState({
     isVisible: false,
@@ -15,22 +18,6 @@ const Dashboard = () => {
     timer: 0,
     link: ''
   });
-
-
-  useEffect(() => {
-    const fetchBannerSettings = async () => {
-      try {
-        const response = await axios.get(`${window.location.origin}/api/getbanner`);
-        setSettings(response.data);
-      } catch (error) {
-        console.error('There was an error fetching the banner settings!', error);
-      }
-    };
-
-    fetchBannerSettings();
-  }, []);
-
-
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
 
@@ -44,19 +31,48 @@ const Dashboard = () => {
     e.preventDefault();
     axios.post(`${window.location.origin}/api/updatebanner`, settings)
       .then(response => {
-        alert('Banner updated successfully');
+        setSnackbar({
+          open: true,
+          message: 'Banner updated successfully',
+          severity: 'success',
+        });
       })
       .catch(error => {
-        console.error('There was an error updating the banner!', error);
+        setSnackbar({
+          open: true,
+          message: error.response?.data.message || 'There was an error updating the banner.',
+          severity: 'error',
+        });
       });
   };
+
+  const handleCloseSnackbar = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
+
+  const fetchBannerSettings = async () => {
+    try {
+      const response = await axios.get(`${window.location.origin}/api/getbanner`);
+      setSettings(response.data);
+    } catch (error) {
+      console.error('There was an error fetching the banner settings!', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchBannerSettings();
+  }, []);
 
   return (
     <>
       <Banner />
-      <Box sx={{ textAlign: 'center', marginTop: '20px' }}>
+
+      <Box sx={{ textAlign: 'center', marginTop: '50px' }}>
         <Typography variant="h2">
           Welcome to the Website
+        </Typography>
+        <Typography variant="h6">
+          After Submitting the form, reload to reflect any changes in banner state
         </Typography>
       </Box>
       <Box sx={{ maxWidth: 400, margin: 'auto', padding: '16px', boxShadow: 3, borderRadius: '8px' }}>
@@ -109,10 +125,28 @@ const Dashboard = () => {
             />
           </FormControl>
 
-          <Button variant="contained" color="primary" type="submit" fullWidth>
+          <Button variant="contained" color="primary" type="submit" fullWidth >
             Update Banner
           </Button>
         </form>
+
+        <Snackbar
+          open={snackbar.open}
+          autoHideDuration={2000}
+          onClose={handleCloseSnackbar}
+          anchorOrigin={{
+            vertical: 'top',
+            horizontal: 'right'
+          }}
+        >
+          <Alert
+            onClose={handleCloseSnackbar}
+            severity={snackbar.severity}
+            sx={{ width: '100%' }}
+          >
+            {snackbar.message}
+          </Alert>
+        </Snackbar>
       </Box>
     </>
   );

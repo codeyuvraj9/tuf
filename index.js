@@ -25,6 +25,10 @@ app.get('/api/getbanner', (req, res) => {
 // Update banner settings
 app.post('/api/updatebanner', (req, res) => {
   const { isVisible, description, timer, link } = req.body;
+  if (timer <= 0) {
+    return res.status(400).send({ message: 'Timer must be greater than zero' });
+  }
+  
   connection.query(
     'UPDATE Banner SET isVisible = ?, description = ?, timer = ?, link = ? WHERE id = 1',
     [isVisible, description, timer, link],

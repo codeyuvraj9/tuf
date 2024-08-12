@@ -15,23 +15,26 @@ export default function Banner() {
         timer: 0,
         link: ''
     });
-    const [countdown, setCountdown] = useState(5);
+    const [countdown, setCountdown] = useState(10);
+
+    const fetchBannerData = async () => {
+        try {
+            const response = await axios.get(`${window.location.origin}/api/getbanner`);
+            const bannerData = {
+                isVisible: response.data.isVisible,
+                description: response.data.description,
+                timer: response.data.timer,
+                link: response.data.link
+            };
+            setBanner(bannerData);
+            setCountdown(response.data.timer);
+        } catch (error) {
+            console.error('There was an error fetching the banner details!', error);
+        }
+    };
 
     useEffect(() => {
-        axios.get(`${window.location.origin}/api/getbanner`)
-            .then(response => {
-                const bannerData = {
-                    isVisible: response.data.isVisible,
-                    description: response.data.description,
-                    timer: response.data.timer,
-                    link: response.data.link
-                };
-                setBanner(bannerData);
-                setCountdown(response.data.timer);
-            })
-            .catch(error => {
-                console.error('There was an error fetching the banner details!', error);
-            });
+        fetchBannerData();
     }, []);
 
     useEffect(() => {
