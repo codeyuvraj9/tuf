@@ -19,7 +19,7 @@ export default function Banner() {
 
     const fetchBannerData = async () => {
         try {
-            const response = await axios.get(`http://localhost:5000/api/getbanner`);
+            const response = await axios.get(`${window.location.origin}/api/getbanner`);
 
             if (response) {
                 const bannerData = {
