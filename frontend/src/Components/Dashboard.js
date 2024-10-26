@@ -1,26 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Box, Typography, Button, FormControl, FormLabel, Checkbox, TextField, Snackbar, Alert } from '@mui/material';
-import Banner from './Banner'
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import {
+  Box, Typography, Button, FormControl, FormLabel, Checkbox,
+  TextField, Snackbar, Alert
+} from '@mui/material';
 
 const Dashboard = () => {
-  //snackbar for success and error messages
+  const navigate = useNavigate(); // Initialize useNavigate
+
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: '',
     severity: 'success'
   });
 
-  //Code for setting Banner, Dashboard part
   const [settings, setSettings] = useState({
-    isVisible: false,
+    isVisible: true,
     description: '',
     timer: 0,
     link: ''
   });
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-
     setSettings({
       ...settings,
       [name]: type === 'checkbox' ? checked : value
@@ -29,7 +32,8 @@ const Dashboard = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    axios.post(`${window.location.origin}/api/updatebanner`, settings)
+
+    axios.post(`http://localhost:5000/api/updatebanner`, settings)
       .then(response => {
         setSnackbar({
           open: true,
@@ -52,8 +56,12 @@ const Dashboard = () => {
 
   const fetchBannerSettings = async () => {
     try {
-      const response = await axios.get(`${window.location.origin}/api/getbanner`);
-      setSettings(response.data);
+      const response = await axios.get(`http://localhost:5000/api/getbanner`);
+      if (response.data) {
+        setSettings(response.data);
+      } else {
+        console.log("No banner is found in database!");
+      }
     } catch (error) {
       console.error('There was an error fetching the banner settings!', error);
     }
@@ -63,22 +71,20 @@ const Dashboard = () => {
     fetchBannerSettings();
   }, []);
 
+  // Handle navigation to the Banner component
+  const handleShowBanner = () => {
+    navigate('/banner'); // Adjust the path to match your route setup
+  };
+
   return (
     <>
-      <Banner />
-
-      <Box sx={{ textAlign: 'center', marginTop: '50px' }}>
+      <Box sx={{ textAlign: 'center', marginTop: '30px' }}>
         <Typography variant="h2">
-          Welcome to the Website
+          Set the Banner
         </Typography>
-        <Typography variant="h6">
-          After Submitting the form, reload to reflect any changes in banner state
-        </Typography>
+        
       </Box>
       <Box sx={{ maxWidth: 400, margin: 'auto', padding: '16px', boxShadow: 3, borderRadius: '8px' }}>
-        <Typography variant="h4" sx={{ textAlign: 'center' }}>
-          Dashboard
-        </Typography>
         <form onSubmit={handleSubmit}>
           <FormControl fullWidth margin="normal">
             <FormLabel>Banner On/Off
@@ -89,7 +95,6 @@ const Dashboard = () => {
                 color="primary"
               />
             </FormLabel>
-
           </FormControl>
 
           <FormControl fullWidth margin="normal">
@@ -125,10 +130,13 @@ const Dashboard = () => {
             />
           </FormControl>
 
-          <Button variant="contained" color="primary" type="submit" fullWidth >
+          <Button variant="contained" color="primary" type="submit" fullWidth sx={{ marginBottom: "10px" }}>
             Update Banner
           </Button>
         </form>
+        <Button variant="contained" color="success" fullWidth onClick={handleShowBanner}>
+          Show Banner Content
+        </Button>
 
         <Snackbar
           open={snackbar.open}

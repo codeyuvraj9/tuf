@@ -1,45 +1,17 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const connection = require('./db'); 
 const path = require("path");
-
-
 const app = express();
 const port = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(bodyParser.json());
+const mongoDB = require("./db");
+mongoDB();
 
-// Get banner settings
-app.get('/api/getbanner', (req, res) => {
-  connection.query('SELECT * FROM Banner WHERE id = 1', (err, results) => {
-    if (err) {
-      return res.status(500).send(err);
-    }
-    
-    res.send(results[0]);
-  });
-});
-
-// Update banner settings
-app.post('/api/updatebanner', (req, res) => {
-  const { isVisible, description, timer, link } = req.body;
-  if (timer <= 0) {
-    return res.status(400).send({ message: 'Timer must be greater than zero' });
-  }
-  
-  connection.query(
-    'UPDATE Banner SET isVisible = ?, description = ?, timer = ?, link = ? WHERE id = 1',
-    [isVisible, description, timer, link],
-    (err, results) => {
-      if (err) {
-        return res.status(500).send(err);
-      }
-      res.send({ message: 'Banner settings updated' });
-    }
-  );
-});
+//Available Routes
+app.use('/', require('./Routes/Banner'));
 
 app.use(express.static(path.join(__dirname, 'frontend', 'build')));
 

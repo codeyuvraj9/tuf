@@ -19,17 +19,21 @@ export default function Banner() {
 
     const fetchBannerData = async () => {
         try {
-            const response = await axios.get(`${window.location.origin}/api/getbanner`);
-            const bannerData = {
-                isVisible: response.data.isVisible,
-                description: response.data.description,
-                timer: response.data.timer,
-                link: response.data.link
-            };
-            setBanner(bannerData);
-            setCountdown(response.data.timer);
+            const response = await axios.get(`http://localhost:5000/api/getbanner`);
+
+            if (response) {
+                const bannerData = {
+                    isVisible: response.data.isVisible,
+                    description: response.data.description,
+                    timer: response.data.timer,
+                    link: response.data.link
+                };
+                setBanner(bannerData);
+                setCountdown(response.data.timer);
+            }
+
         } catch (error) {
-            console.error('There was an error fetching the banner details!', error);
+            console.error('There was an error fetching the banner details', error);
         }
     };
 
@@ -62,7 +66,7 @@ export default function Banner() {
 
     return (
         <div>
-            <Container>
+            <Container sx={{ textAlign: 'center' }}>
                 {banner.isVisible ? (
                     <Box sx={{ backgroundColor: '#F6AE9F', padding: '10px', borderRadius: '8px', textAlign: 'center' }}>
                         <Typography variant="h5">
@@ -77,7 +81,11 @@ export default function Banner() {
                             </Button>
                         </MUILink>
                     </Box>
-                ) : null}
+                ) : (
+                    <Typography variant="h6">
+                        Banner Timed Out or Turned Off!
+                    </Typography>
+                )}
             </Container>
         </div>
     );
