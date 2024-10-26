@@ -33,7 +33,7 @@ const Dashboard = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    axios.post(`${window.process.env}/api/updatebanner`, settings)
+    axios.post(`${window.location.origin}/api/updatebanner`, settings)
       .then(response => {
         setSnackbar({
           open: true,
@@ -56,7 +56,7 @@ const Dashboard = () => {
 
   const fetchBannerSettings = async () => {
     try {
-      const response = await axios.get(`${window.process.env}/api/getbanner`);
+      const response = await axios.get(`${window.location.origin}/api/getbanner`);
       if (response.data) {
         setSettings(response.data);
       } else {
